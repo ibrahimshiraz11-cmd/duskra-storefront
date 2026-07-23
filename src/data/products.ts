@@ -13,7 +13,7 @@ export type Product = {
   description: string
 }
 
-export const PRODUCTS: Product[] = [
+export const SEED_PRODUCTS: Product[] = [
   {
     id: 'p1',
     name: 'Moving Sand Horizon',

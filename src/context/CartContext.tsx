@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useMemo, type ReactNode } from 'react'
-import { PRODUCTS } from '../data/products'
+import { useProducts } from './ProductsContext'
+
+export const DELIVERY_FEE = 260
 
 type CartLine = { id: string; qty: number }
 
@@ -11,13 +13,17 @@ type CartContextType = {
   addToCart: (id: string) => void
   changeQty: (id: string, delta: number) => void
   removeFromCart: (id: string) => void
+  clearCart: () => void
   count: number
-  total: number
+  subtotal: number
+  deliveryFee: number
+  grandTotal: number
 }
 
 const CartContext = createContext<CartContextType | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { products } = useProducts()
   const [lines, setLines] = useState<CartLine[]>([])
   const [isOpen, setIsOpen] = useState(false)
 
@@ -44,15 +50,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setLines((prev) => prev.filter((l) => l.id !== id))
   }
 
+  const clearCart = () => setLines([])
+
   const count = useMemo(() => lines.reduce((s, l) => s + l.qty, 0), [lines])
-  const total = useMemo(
+  const subtotal = useMemo(
     () =>
       lines.reduce((s, l) => {
-        const p = PRODUCTS.find((p) => p.id === l.id)
+        const p = products.find((p) => p.id === l.id)
         return s + (p ? p.price * l.qty : 0)
       }, 0),
-    [lines],
+    [lines, products],
   )
+  const deliveryFee = lines.length > 0 ? DELIVERY_FEE : 0
+  const grandTotal = subtotal + deliveryFee
 
   return (
     <CartContext.Provider
@@ -64,8 +74,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
         addToCart,
         changeQty,
         removeFromCart,
+        clearCart,
         count,
-        total,
+        subtotal,
+        deliveryFee,
+        grandTotal,
       }}
     >
       {children}

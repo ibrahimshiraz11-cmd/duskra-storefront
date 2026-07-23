@@ -1,8 +1,9 @@
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
+import { Truck, ShieldCheck, PackageCheck } from 'lucide-react'
 import Hero from '../components/Hero'
 import ProductCard from '../components/ProductCard'
-import { PRODUCTS } from '../data/products'
+import { useProducts } from '../context/ProductsContext'
 
 const FADE = {
   initial: { opacity: 0, y: 24 },
@@ -11,15 +12,28 @@ const FADE = {
   transition: { duration: 0.7, ease: [0.2, 0.8, 0.3, 1] as const },
 }
 
+const TRUST_ITEMS = [
+  { icon: Truck, title: 'Free delivery over Rs 3,000', copy: 'Nationwide, tracked from dispatch to door.' },
+  { icon: ShieldCheck, title: 'Cash on delivery', copy: 'Pay only once it\u2019s in your hands.' },
+  { icon: PackageCheck, title: 'Hand-checked before it ships', copy: 'Every piece inspected, not just packed.' },
+]
+
 export default function Home() {
-  const featured = PRODUCTS.slice(0, 4)
+  const { products } = useProducts()
+  const featured = products.slice(0, 4)
 
   return (
     <div>
       <Hero />
 
       <div className="px-3 md:px-5 py-3">
-        <div className="overflow-hidden border-y border-[rgba(30,50,90,0.08)] py-4">
+        <div
+          className="overflow-hidden border-y border-[rgba(30,50,90,0.08)] py-4"
+          style={{
+            maskImage: 'linear-gradient(90deg, transparent, black 8%, black 92%, transparent)',
+            WebkitMaskImage: 'linear-gradient(90deg, transparent, black 8%, black 92%, transparent)',
+          }}
+        >
           <div className="flex gap-14 whitespace-nowrap animate-[marquee_26s_linear_infinite] w-max">
             {Array(2)
               .fill(0)
@@ -56,10 +70,46 @@ export default function Home() {
             </p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {featured.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {featured.map((p, i) => (
+              <motion.div
+                key={p.id}
+                initial={{ opacity: 0, y: 32 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.2, 0.8, 0.3, 1] }}
+              >
+                <ProductCard product={p} />
+              </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="px-3 md:px-5 pb-20 md:pb-28">
+        <div className="max-w-[1320px] mx-auto grid grid-cols-1 sm:grid-cols-3 gap-5">
+          {TRUST_ITEMS.map((item, i) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: i * 0.12, ease: [0.2, 0.8, 0.3, 1] }}
+              whileHover={{ y: -4 }}
+              className="rounded-[1.6rem] bg-white/55 border border-white/70 backdrop-blur-sm p-6 md:p-7 flex items-start gap-4 transition-shadow hover:shadow-[0_24px_50px_-24px_rgba(30,50,90,0.25)]"
+            >
+              <div className="w-11 h-11 rounded-full bg-[rgba(30,50,90,0.08)] flex items-center justify-center shrink-0">
+                <item.icon className="w-5 h-5 text-[rgba(30,50,90,0.85)]" />
+              </div>
+              <div>
+                <div className="text-[15px] font-medium text-[rgba(30,50,90,0.95)] mb-1">
+                  {item.title}
+                </div>
+                <div className="text-[13.5px] text-[rgba(30,50,90,0.55)] leading-relaxed">
+                  {item.copy}
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </section>
 
@@ -77,19 +127,29 @@ export default function Home() {
               horizon. Everything since has followed the same brief: nothing loud, nothing
               disposable.
             </p>
-            <Link
-              to="/about"
-              className="inline-flex items-center gap-2 bg-white/60 border border-white/70 backdrop-blur-md text-[rgba(30,50,90,0.9)] rounded-full px-6 py-3 text-sm hover:bg-white/80 transition-colors"
-            >
-              Read the full story
-            </Link>
+            <motion.div whileHover={{ x: 4 }} className="inline-block">
+              <Link
+                to="/about"
+                className="inline-flex items-center gap-2 bg-white/60 border border-white/70 backdrop-blur-md text-[rgba(30,50,90,0.9)] rounded-full px-6 py-3 text-sm hover:bg-white/80 hover:shadow-[0_16px_32px_-16px_rgba(30,50,90,0.3)] transition-all"
+              >
+                Read the full story
+              </Link>
+            </motion.div>
           </motion.div>
-          <motion.img
-            {...FADE}
-            src="https://images.unsplash.com/photo-1524634126442-357e0eac3c14?q=80&w=900&auto=format&fit=crop"
-            alt="Styled desk"
-            className="rounded-[1.6rem] w-full aspect-square object-cover"
-          />
+          <motion.div
+            initial={{ opacity: 0, clipPath: 'inset(0 0 100% 0 round 1.6rem)' }}
+            whileInView={{ opacity: 1, clipPath: 'inset(0 0 0% 0 round 1.6rem)' }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.9, ease: [0.2, 0.8, 0.3, 1] }}
+            whileHover={{ scale: 1.02 }}
+            className="rounded-[1.6rem] overflow-hidden"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1524634126442-357e0eac3c14?q=80&w=900&auto=format&fit=crop"
+              alt="Styled desk"
+              className="w-full aspect-square object-cover transition-transform duration-700 hover:scale-105"
+            />
+          </motion.div>
         </div>
       </section>
     </div>

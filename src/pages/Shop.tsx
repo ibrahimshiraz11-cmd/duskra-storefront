@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import Navbar from '../components/Navbar'
 import ProductCard from '../components/ProductCard'
-import { PRODUCTS } from '../data/products'
+import { useProducts } from '../context/ProductsContext'
 
 export default function Shop() {
-  const categories = ['All', ...Array.from(new Set(PRODUCTS.map((p) => p.category)))]
+  const { products, loading } = useProducts()
+  const categories = ['All', ...Array.from(new Set(products.map((p) => p.category)))]
   const [active, setActive] = useState('All')
 
-  const list = active === 'All' ? PRODUCTS : PRODUCTS.filter((p) => p.category === active)
+  const list = active === 'All' ? products : products.filter((p) => p.category === active)
 
   return (
     <div className="px-3 md:px-5 pt-3 md:pt-5">
@@ -59,9 +60,13 @@ export default function Shop() {
           ))}
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {list.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+          {loading ? (
+            <div className="col-span-full text-center py-16 text-[#8b90a0] text-sm">
+              Loading the shelf…
+            </div>
+          ) : (
+            list.map((p) => <ProductCard key={p.id} product={p} />)
+          )}
         </div>
       </div>
     </div>

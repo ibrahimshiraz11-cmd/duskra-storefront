@@ -4,7 +4,8 @@ import { motion } from 'motion/react'
 import { ChevronRight, Play } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import ProductCard from '../components/ProductCard'
-import { PRODUCTS, type Product as ProductType } from '../data/products'
+import type { Product as ProductType } from '../data/products'
+import { useProducts } from '../context/ProductsContext'
 import { useCart } from '../context/CartContext'
 
 const fmt = (n: number) => 'Rs ' + n.toLocaleString('en-PK')
@@ -26,7 +27,8 @@ const ACCORDION = [
 
 export default function Product() {
   const { id } = useParams()
-  const product = PRODUCTS.find((p) => p.id === id)
+  const { products } = useProducts()
+  const product = products.find((p) => p.id === id)
   const { addToCart, openCart } = useCart()
   const [openAcc, setOpenAcc] = useState<number | null>(null)
 
@@ -127,7 +129,7 @@ export default function Product() {
             Complete the shelf.
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {PRODUCTS.filter((p) => p.id !== product.id).map((p) => (
+            {products.filter((p) => p.id !== product.id).map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </div>

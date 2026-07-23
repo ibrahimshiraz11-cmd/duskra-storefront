@@ -1,12 +1,14 @@
 import { motion, AnimatePresence } from 'motion/react'
+import { Link } from 'react-router-dom'
 import { X, Minus, Plus } from 'lucide-react'
 import { useCart } from '../context/CartContext'
-import { PRODUCTS } from '../data/products'
+import { useProducts } from '../context/ProductsContext'
 
 const fmt = (n: number) => 'Rs ' + n.toLocaleString('en-PK')
 
 export default function CartDrawer() {
-  const { lines, isOpen, closeCart, changeQty, removeFromCart, total } = useCart()
+  const { lines, isOpen, closeCart, changeQty, removeFromCart, subtotal, deliveryFee, grandTotal } = useCart()
+  const { products } = useProducts()
 
   return (
     <AnimatePresence>
@@ -43,7 +45,7 @@ export default function CartDrawer() {
                 </div>
               ) : (
                 lines.map((line) => {
-                  const p = PRODUCTS.find((p) => p.id === line.id)
+                  const p = products.find((p) => p.id === line.id)
                   if (!p) return null
                   return (
                     <div
@@ -91,19 +93,34 @@ export default function CartDrawer() {
             </div>
 
             <div className="px-6 py-5 border-t border-[rgba(30,50,90,0.08)]">
-              <div className="flex justify-between text-sm mb-1 text-[rgba(30,50,90,0.95)]">
+              <div className="flex justify-between text-sm mb-1.5 text-[rgba(30,50,90,0.8)]">
                 <span>Subtotal</span>
-                <strong>{fmt(total)}</strong>
+                <span>{fmt(subtotal)}</span>
               </div>
-              <div className="text-[11px] text-[rgba(30,50,90,0.45)] mb-4">
-                Shipping calculated at checkout.
+              <div className="flex justify-between text-sm mb-3 text-[rgba(30,50,90,0.8)]">
+                <span>Delivery</span>
+                <span>{lines.length === 0 ? '—' : fmt(deliveryFee)}</span>
               </div>
-              <button
-                disabled={lines.length === 0}
-                className="w-full bg-[rgba(30,50,90,0.9)] disabled:opacity-40 text-white rounded-full py-3.5 text-sm font-medium hover:bg-[rgba(30,50,90,1)] transition-colors"
-              >
-                Checkout
-              </button>
+              <div className="flex justify-between text-base mb-4 text-[rgba(30,50,90,0.95)] pt-3 border-t border-[rgba(30,50,90,0.08)]">
+                <span>Total</span>
+                <strong>{fmt(grandTotal)}</strong>
+              </div>
+              {lines.length === 0 ? (
+                <button
+                  disabled
+                  className="w-full bg-[rgba(30,50,90,0.9)] opacity-40 text-white rounded-full py-3.5 text-sm font-medium"
+                >
+                  Checkout
+                </button>
+              ) : (
+                <Link
+                  to="/checkout"
+                  onClick={closeCart}
+                  className="block w-full text-center bg-[rgba(30,50,90,0.9)] text-white rounded-full py-3.5 text-sm font-medium hover:bg-[rgba(30,50,90,1)] transition-colors"
+                >
+                  Checkout
+                </Link>
+              )}
             </div>
           </motion.aside>
         </>
