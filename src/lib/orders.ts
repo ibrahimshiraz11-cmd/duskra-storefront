@@ -86,7 +86,17 @@ export async function createOrder(
     .single()
 
   if (error) throw new Error(error.message)
-  return fromRow(data as OrderRow)
+  const order = fromRow(data as OrderRow)
+
+  // Fire-and-forget order confirmation email — never blocks or fails checkout
+  // if the email doesn't go through.
+  if (isSupabaseConfigured && supabase) {
+    supabase.functions.invoke('send-order-email', { body: order }).catch((err) => {
+      console.error('Order email failed to send:', err)
+    })
+  }
+
+  return order
 }
 
 export async function fetchOrders(): Promise<Order[]> {
