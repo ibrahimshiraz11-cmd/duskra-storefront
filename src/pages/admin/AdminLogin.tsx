@@ -65,9 +65,6 @@ export default function AdminLogin() {
             Sign in
           </button>
         </form>
-        <div className="mt-5 text-[11.5px] text-[#5c5f6e] text-center">
-          Demo credentials — id: <strong>admin</strong> · pass: <strong>duskra2026</strong>
-        </div>
       </div>
     </div>
   )
