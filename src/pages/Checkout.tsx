@@ -17,6 +17,7 @@ export default function Checkout() {
   const [form, setForm] = useState({ name: '', phone: '', address: '' })
   const [submitting, setSubmitting] = useState(false)
   const [placedOrderId, setPlacedOrderId] = useState<string | null>(null)
+  const [placedTotal, setPlacedTotal] = useState<number>(0)
   const [error, setError] = useState<string | null>(null)
 
   const itemsWithDetails = lines
@@ -41,6 +42,7 @@ export default function Checkout() {
         total: grandTotal,
       })
       setPlacedOrderId(order.id)
+      setPlacedTotal(grandTotal)
       clearCart()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong placing your order.')
@@ -64,7 +66,7 @@ export default function Checkout() {
               Order placed.
             </h1>
             <p className="text-[15px] text-[rgba(30,50,90,0.6)] mb-2">
-              Order <strong>#{placedOrderId.slice(-8)}</strong> — cash on delivery, {fmt(grandTotal)} due at
+              Order <strong>#{placedOrderId.slice(-8)}</strong> — cash on delivery, {fmt(placedTotal)} due at
               your door.
             </p>
             <p className="text-[14px] text-[rgba(30,50,90,0.5)] mb-8">
